@@ -6,15 +6,22 @@ pipeline {
                 git url: 'https://github.com/falah-23/sast-demo-app.git', branch: 'master'
             }
         }
-        stage('Install Bandit') {
+        stage('Install Dependencies') {
             steps {
-                sh 'pip install bandit'
+                script {
+                    // Membuat dan mengaktifkan virtual environment
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate && pip install bandit'
+                }
             }
         }
         stage('SAST Analysis') {
             steps {
-                sh 'bandit -f xml -o bandit-output.xml -r . || true'
-                recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
+                script {
+                    // Jalankan Bandit di dalam virtual environment
+                    sh '. venv/bin/activate && bandit -f xml -o bandit-output.xml -r . || true'
+                    recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
+                }
             }
         }
     }
