@@ -9,7 +9,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Membuat dan mengaktifkan virtual environment
+                    // Membuat virtual environment dan menginstal Bandit
                     sh 'python3 -m venv venv'
                     sh '. venv/bin/activate && pip install bandit'
                 }
@@ -18,9 +18,16 @@ pipeline {
         stage('SAST Analysis') {
             steps {
                 script {
-                    // Jalankan Bandit di dalam virtual environment
+                    // Jalankan Bandit dan output ke file XML
                     sh '. venv/bin/activate && bandit -f xml -o bandit-output.xml -r . || true'
-                    recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
+                    
+                    // Menampilkan laporan Bandit dalam Jenkins
+                    publishHTML(target: [
+                        reportName: 'Bandit Analysis',
+                        reportDir: 'bandit-output.xml',
+                        reportFiles: 'bandit-output.xml',
+                        keepAll: true
+                    ])
                 }
             }
         }
