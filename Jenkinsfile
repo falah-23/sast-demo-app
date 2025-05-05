@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-username/sast-demo-app.git', branch: 'master'
+                git url: 'https://github.com/falah-23/sast-demo-app.git', branch: 'master'
             }
         }
         stage('Install Bandit') {
